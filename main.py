@@ -1,14 +1,15 @@
 # main.py
 import asyncio
-import sys # 导入sys模块来读取命令行参数
-from fastapi import FastAPI
+import sys  # 导入sys模块来读取命令行参数
+
 import uvicorn
+from fastapi import FastAPI
 
 from api.v1 import endpoints as api_v1
 from core.onebot_listener import listen_for_events
-from core.scheduler import proactive_attack_task # 导入新的定时任务
+from core.scheduler import proactive_attack_task  # 导入新的定时任务
 from database.models import initialize_database
-from database.utils import reset_all_databases # 导入重置函数
+from database.utils import reset_all_databases  # 导入重置函数
 
 # 创建 FastAPI 应用实例
 app = FastAPI(title="TrollBot Server")
