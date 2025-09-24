@@ -1,6 +1,6 @@
 # core/state.py
-from typing import Dict, List, Deque
 from collections import deque
+from typing import Deque, Dict, List
 
 # --- 共享状态 ---
 
@@ -11,4 +11,4 @@ slow_track_buffers_by_group: Dict[int, List[dict]] = {}
 recent_contexts_by_group: Dict[int, Deque[dict]] = {}
 
 # 3. 用于快速通道和定时任务的发言时间戳，实现冷却和主动攻击
-last_speech_timestamps: Dict[int, float] = {} 
+last_speech_timestamps: Dict[int, float] = {}

@@ -22,7 +22,7 @@
 ```
 TrollBot/
 ├── main.py                    # 应用程序入口
-├── config.py                  # 配置文件
+├── bot_config.py              # 机器人运行配置
 ├── api/
 │   └── v1/
 │       └── endpoints.py       # API端点定义
@@ -37,13 +37,15 @@ TrollBot/
 │   ├── crud.py               # 数据库操作
 │   └── utils.py              # 数据库工具函数
 ├── services/                  # 业务服务层
-│   ├── memory_service.py     # 记忆服务（向量存储）
-│   ├── profile_service.py    # 用户画像服务
+│   ├── graphrag_manager.py   # GraphRAG 管理器
+│   ├── memory_service.py     # 记忆服务（GraphRAG 记忆）
+│   ├── profile_service.py    # 用户画像服务（GraphRAG 支持）
 │   └── topic_service.py      # 话题管理服务
+├── trollbot_graphrag/        # 集成的 Youtu-GraphRAG 框架源码
 ├── prompts/                   # LLM提示词模板
 └── data/                     # 数据存储目录
-    ├── memory_db/            # ChromaDB向量数据库
-    └── profiles.db           # SQLite用户数据库
+    ├── graphrag/             # GraphRAG 输出与缓存
+    └── profiles.db           # SQLite用户数据库（兼容保留）
 ```
 
 ## 🔧 技术栈
@@ -51,7 +53,7 @@ TrollBot/
 - **后端框架**：FastAPI
 - **QQ协议**：OneBot v11
 - **AI服务**：OpenAI API（支持多提供商）
-- **向量数据库**：ChromaDB
+- **知识图谱检索**：Youtu-GraphRAG（FAISS + 图谱推理）
 - **关系数据库**：SQLite
 - **异步通信**：WebSocket + HTTP
 - **依赖管理**：Python pip
@@ -74,11 +76,19 @@ TrollBot/
 ### 数据存储
 - **用户档案**（SQLite）：用户基本信息、昵称历史、态度分析
 - **对话主题**（SQLite）：话题总结、参与者观点
-- **记忆向量**（ChromaDB）：对话内容的语义向量存储
+- **图谱记忆**（GraphRAG）：对话与画像的结构化知识图谱
+
+## 🧠 GraphRAG 记忆与画像体系
+
+- 所有记忆、画像与态度更新都会被封装为 `GraphDocument`，写入 `data/graphrag/corpus.json`。
+- `services/graphrag_manager.py` 负责调用 Youtu-GraphRAG 的 `KTBuilder` 重新构建知识图谱，并通过 `KTRetriever` 进行检索。
+- `services/memory_service.py` 使用 GraphRAG 构建的图谱来搜索黑历史，并将对话摘要转换为结构化记忆。
+- `services/profile_service.py` 利用 GraphRAG 的检索结果生成用户画像，包含别名和社交态度等信息。
+- `database/utils.reset_all_databases` 支持一键清空 GraphRAG 输出，便于测试和重新训练。
 
 ## ⚙️ 配置说明
 
-主要配置项位于 `config.py`：
+主要配置项位于 `bot_config.py`：
 
 - **OneBot配置**：WebSocket和HTTP连接地址
 - **机器人配置**：目标群组、机器人QQ号等
